@@ -1,4 +1,4 @@
-from bee import Bee
+from Bee import Bee
 
 
 class BeeAlgorithm:
@@ -13,5 +13,19 @@ class BeeAlgorithm:
 
         self.food_source_position = 0
         self.population = []
-        self.fitness = []
-        self.training = []
+        self.cost = []
+        self.list_of_best_solutions = []
+        self.best_bee = None
+
+    def generate_population(self):
+        return [Bee() for _ in range(self.amount_of_bees)]
+
+    def search(self):
+        self.population = self.generate_population()
+
+    def choose_best_bee(self):
+        for bee in self.population:
+            bee.calculate_bee_cost()
+        self.population = sorted(self.population, key=lambda x: x.cost)
+
+

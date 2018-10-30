@@ -1,18 +1,18 @@
 import numpy as np
-from beeAlgorithm import BeeAlgorithm
-from bee import Bee
+from BeeAlgorithm import BeeAlgorithm
+import INI
+
+from Bee import Bee
 
 
-available_coins = [1, 2, 5, 10, 20, 50, 100, 200]
-statistical_day = np.random.randint(499, size=100)
-coins_to_save = [2, 5, 20, 100]
+available_coins = INI.available_coins
+statistical_day = INI.statistical_day
+coins_to_save = INI.coins_to_save
 
-
-max_iterations = 200
+max_iterations = INI.max_iterations
 required_cost = sum(statistical_day) / 1000
-expected_quantity_of_coins = [50, 25, 20, 10]
-amount_of_bees = 100
-food_source_position = 0;
+expected_quantity_of_coins = INI.expected_quantity_of_coins
+amount_of_bees = INI.amount_of_bees
 
 population = []
 fitness = []
@@ -20,9 +20,9 @@ training = []
 
 
 if __name__ == '__main__':
-    #bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_bees, expected_quantity_of_coins, statistical_day)
-    for i in range(2):
-        bee = Bee()
+    bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_bees, expected_quantity_of_coins, statistical_day)
+    bee_algorithm.population = bee_algorithm.generate_population()
+    for bee in bee_algorithm.population:
         bee.calculate_change_randomly(statistical_day, available_coins)
         bee.calculate_bee_cost(coins_to_save, expected_quantity_of_coins)
         bee.print_cost()
