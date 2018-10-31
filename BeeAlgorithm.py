@@ -14,7 +14,7 @@ class BeeAlgorithm:
         self.food_source_position = 0
         self.population = []
         self.cost = []
-        self.list_of_best_solutions = []
+        self.list_of_best_cost_solutions = []
         self.best_bee = None
 
     def generate_population(self):
@@ -29,13 +29,14 @@ class BeeAlgorithm:
     def choose_best_bee(self, best):
         for bee in self.population:
             bee.calculate_bee_cost(self.coins_to_save, self.expected_quantity_of_coins)
-            bee.print_cost()
+            #bee.print_cost()
         self.population = sorted(self.population, key=lambda x: x.cost)
-        self.list_of_best_solutions.append(self.population[0])
+
         if not best or self.population[0].cost < best.cost:
             best_bee = self.population[0]
         else:
             best_bee = best
+        self.list_of_best_cost_solutions.append(best_bee.cost)
         return best_bee
 
     def calculate_cost_for_population(self):
