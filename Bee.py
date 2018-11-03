@@ -4,7 +4,6 @@ from encoders import *
 
 class Bee:
     def __init__(self):
-        print('Bee created')
         self.number_of_ways_to_give_change = 22
         self.number_of_used_bankotes_and_coins = 8
         self.solution_matrix = np.zeros((self.number_of_used_bankotes_and_coins, self.number_of_ways_to_give_change))

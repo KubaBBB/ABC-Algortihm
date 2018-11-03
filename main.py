@@ -2,6 +2,7 @@ import numpy as np
 from BeeAlgorithm import BeeAlgorithm
 import INI
 from matplotlib import pyplot as plt
+import time
 
 
 available_coins = INI.available_coins
@@ -31,27 +32,24 @@ if __name__ == '__main__':
       #  bee.calculate_bee_cost(coins_to_save, expected_quantity_of_coins)
        # bee.print_cost()
     for i in range(max_iterations):
-        bee_algorithm.search_best_bee()
-        bee_algorithm.print_best_bee()
-        print('\n\n')
-        for bee in bee_algorithm.population:
-            bee.print_cost()
+        start = time.time()
+        bee_algorithm.perform_next_iteration()
+        end = time.time()
+        print('Time of performing iteration: ' + str(end - start))
 
-    print(bee_algorithm.list_of_best_cost_solutions)
+    #print(bee_algorithm.list_of_best_cost_solutions)
     plt.figure(figsize=(10,10))
     plt.plot([_ for _ in range(max_iterations)], bee_algorithm.list_of_best_cost_solutions)
-    plt.title('WYKRES')
-    plt.xlabel('xLABEL')
-    plt.ylabel('yLABEL')
+    plt.title('Artificial Bee Colony (ABC)')
+    plt.xlabel('number of iteration')
+    plt.ylabel('fitness value')
+    axes = plt.gca()
+    axes.set_xlim([1, max_iterations])
+    axes.set_ylim([0, bee_algorithm.list_of_best_cost_solutions[0]])
+    #plt.axes([1, max_iterations, 0, bee_algorithm.list_of_best_cost_solutions[0]])
     plt.show()
         #bee.print_solution()
 
 
-def search_optimum():
-    return 2;
-
-
-def select_best_solution(best):
-    return 1;
 
 
