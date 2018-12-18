@@ -6,8 +6,8 @@ from random import sample
 class Bee:
     def __init__(self, bee_type):
         self.number_of_ways_to_give_change = 22
-        self.number_of_used_bankotes_and_coins = 8
-        self.solution_matrix = np.zeros((self.number_of_used_bankotes_and_coins, self.number_of_ways_to_give_change),
+        self.number_of_used_banknotes_and_coins = 8
+        self.solution_matrix = np.zeros((self.number_of_used_banknotes_and_coins, self.number_of_ways_to_give_change),
                                         dtype=int)
         self.cost = [10000]
         self.bee_type = bee_type;
@@ -38,10 +38,6 @@ class Bee:
             generated_value = np.random.choice(adjusted_available_coins)
             if temp + generated_value <= value:
                 temp = temp + generated_value
-                # print('generated value: ' + str(generated_value))
-                # print('value: ' + str(value))
-                # print('rows_encoder[generated_value]: ' + str(rows_encoder[generated_value]))
-                # print('cols_encoder[value]: ' + str(cols_encoder[value]))
                 self.solution_matrix[rows_encoder[generated_value]][cols_encoder[value]] += 1
 
     def search_food_with_patch_size(self, available_coins, patch_size):
@@ -49,28 +45,31 @@ class Bee:
         patch = sorted(sample(range(22), patch_size), key=int)
 
         for column in patch:
+            #max_money_to_change =
             change = 0
             for row in range(rows_encoder.__len__()):
                 if self.solution_matrix[row, column] != 0:
                     change += keys[row]*self.solution_matrix[row, column]
                     self.solution_matrix[row, column] = 0
 
-            divided_change = [get_digit(change, 2) * 100,
-                              get_digit(change, 1) * 10,
-                              get_digit(change, 0)]
-            adjusted_available_coins = list(filter(lambda x: x < 10 ** len(str(change)), available_coins))
-            #print(divided_change)
-            if divided_change[0] > 400:
-                t = divided_change[0]/400
-                for i in range(int(t)):
-                    divided_change[0] -= divided_change[0]*t*400
+            if change < 499:
+                self.calculate_for_every_divided_change(change, available_coins)
             else:
-                for value in divided_change:
-                    self.divide_value(value, adjusted_available_coins)
+                adjusted_change = break_the_rest_to_exchange(change)
+                for ch in adjusted_change:
+                    self.calculate_for_every_divided_change(ch, available_coins)
+
+    def calculate_for_every_divided_change(self, change, available_coins):
+        divided_change = [get_digit(change, 2) * 100,
+                          get_digit(change, 1) * 10,
+                          get_digit(change, 0)]
+        adjusted_available_coins = list(filter(lambda x: x < 10 ** len(str(change)), available_coins))
+        for value in divided_change:
+            self.divide_value(value, adjusted_available_coins)
 
     def set_to_be_onlooker(self):
         self.bee_type = BeeType.Onlooker;
-        pass;
+        pass
 
     def reload_solution_matrix(self):
         self.solution_matrix.fill(0)
@@ -81,6 +80,15 @@ class Bee:
     def print_solution(self):
         print('Solution: \n' + str(self.solution_matrix))
 
+
+def break_the_rest_to_exchange(value):
+    exchange_list =[np.random.randint(499)]
+    while sum(exchange_list) != value:
+        max_val = 499 if value - sum(exchange_list) > 499 else value - sum(exchange_list)
+        generated_value = np.random.randint(max_val+1)
+        exchange_list.append(generated_value)
+
+    return exchange_list
 
 def get_digit(number, n):
     return number // 10 ** n % 10

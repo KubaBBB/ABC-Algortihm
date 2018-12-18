@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
         plt.figure(figsize=(fig_width, fig_height))
         plt.plot([_ for _ in range(max_iterations)], bee_algorithm.list_of_best_cost_solutions)
-        plt.title('Artificial Bee Colony (ABC)')
+        plt.title('Bees Algorithm (BA)')
         plt.xlabel('iteration')
         plt.ylabel('fitness value')
         bee_algorithm.print_bees_solution()

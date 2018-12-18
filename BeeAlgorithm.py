@@ -34,7 +34,7 @@ class BeeAlgorithm:
     def calculate_change(self):
         for bee in self.population:
             if bee.bee_type == BeeType.Scout:
-                print('hey')
+                #print('hey')
                 bee.calculate_change_randomly(self.statistical_day, self.available_coins);
             elif bee.bee_type == BeeType.Onlooker:
                 bee.search_food_with_patch_size(self.available_coins, self.patch_size);
@@ -44,25 +44,26 @@ class BeeAlgorithm:
         self.calculate_fitness_cost()
         self.best_bee = self.choose_best_bee(self.best_bee)
         self.print_best_bee()
-        self.update_population()
         self.reload_solution()
+        self.update_population()
         self.print_amount_of_population()
         return
 
     def update_population(self):
-        onlookers = 0;
-        for bee in self.population:
-            if bee.bee_type == BeeType.Onlooker:
-                onlookers+=1;
-        if onlookers == 0:
-            onlooker_bees = [deepcopy(self.best_bee) for _ in range(self.amount_of_bees_searching_patch)]
+        onlooker_bees = [deepcopy(self.best_bee) for _ in range(self.amount_of_bees_searching_patch)]
+        free_bees = (self.amount_of_bees_searching_patch + self.amount_of_bees) - self.population.__len__()
+
+        if free_bees != 0:
             for bee in onlooker_bees:
-                bee.set_to_be_onlooker();
-            self.population += onlooker_bees;
+                bee.set_to_be_onlooker()        #could be optimized -> copy construtor without iterating
+        else:
+            self.population = [bee for bee in self.population if bee.bee_type != BeeType.Onlooker]
+        self.population += onlooker_bees;
 
     def reload_solution(self):
         for bee in self.population:
-            bee.reload_solution_matrix();
+            if bee.bee_type is BeeType.Onlooker:
+                bee.reload_solution_matrix()
 
     def calculate_fitness_cost(self):
         for bee in self.population:
@@ -96,8 +97,7 @@ class BeeAlgorithm:
     def print_bees_solution(self):
         print('onlookers' + str(sum((i.bee_type == BeeType.Onlooker) for i in self.population)))
         print('Scouts' + str(sum((i.bee_type == BeeType.Scout) for i in self.population)))
-        print('sekowska: ' + str(sum(sum(self.best_bee.solution_matrix))))
-        change = 0;
+        change = 0
         r = list(encoders.rows_encoder.keys());
         for column in range(encoders.cols_encoder.values().__len__()):
             for row in range(encoders.rows_encoder.__len__()):
