@@ -10,7 +10,7 @@ def generate_population(bee_type, num_of_bees):
 
 class BeeAlgorithm:
     def __init__(self, available_coins, coins_to_save, amount_of_bees, amount_of_best_bees, expected_quantity_of_coins,
-                 statistical_day, patch_size, type_of_selecting_patch):
+                 statistical_day, patch_size, type_of_selecting_patch, type_of_fitness_function):
         self.available_coins = available_coins
         self.statistical_day = statistical_day
         self.coins_to_save = coins_to_save
@@ -23,6 +23,7 @@ class BeeAlgorithm:
         self.list_of_best_cost_solutions = []
         self.best_bee = None
         self.type_of_selecting_patch = type_of_selecting_patch
+        self.type_of_fitness_function = type_of_fitness_function
         self.temp_solution = 0
 
     def generate_start_population(self):
@@ -79,7 +80,10 @@ class BeeAlgorithm:
 
     def calculate_fitness_cost(self):
         for bee in self.population:
-            bee.calculate_bee_cost(self.coins_to_save, self.expected_quantity_of_coins)
+            if self.type_of_fitness_function == FitnessFunction.QuantityOfCoins:
+                bee.calculate_bee_cost(self.coins_to_save, self.expected_quantity_of_coins)
+            elif self.type_of_fitness_function == FitnessFunction.ValueOfCoins:
+                bee.calculate_bee_cost_modifided_fitness(self.coins_to_save, self.expected_quantity_of_coins)
         self.population = sorted(self.population, key=lambda x: x.cost)
 
     def choose_best_bee(self, best):
@@ -119,8 +123,6 @@ class BeeAlgorithm:
     def print_bees_solution(self):
         print('onlookers' + str(sum((i.bee_type == BeeType.Onlooker) for i in self.population)))
         print('Scouts' + str(sum((i.bee_type == BeeType.Scout) for i in self.population)))
-        change = 0
-        r = list(encoders.rows_encoder.keys());
 
         print('solution: ' + str(self.calc_solution()))
 
@@ -130,3 +132,8 @@ class SelectPatch():
     IntelligentColumns = "Intelligent column"
     RandomCells = "Random cells"
     IntelligentCells = "Intelligent cells"
+
+
+class FitnessFunction():
+    QuantityOfCoins = "Amount of quantity of coins"
+    ValueOfCoins = "Total value of coins to save"

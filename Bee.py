@@ -21,6 +21,14 @@ class Bee:
         self.cost = sum(difference)
         return self.cost
 
+    def calculate_bee_cost_modifided_fitness(self, coins_to_save, expected_quantity_of_coins):
+        value_of_rows = np.zeros(len(coins_to_save), dtype = int)
+        difference = np.zeros(len(coins_to_save))
+        for i in range(len(coins_to_save)):
+            value_of_rows[i] = sum(self.solution_matrix[rows_encoder[coins_to_save[i]]]) * coins_to_save[i]
+        self.cost = sum(value_of_rows)
+        return self.cost
+
     def calculate_change_randomly(self, statistical_day, available_coins):
         for change in statistical_day:
             divided_change = [get_digit(change, 2) * 100,
