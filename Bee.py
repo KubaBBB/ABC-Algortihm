@@ -74,7 +74,6 @@ class Bee:
             for ch in adjusted_change:
                 self.calculate_for_every_divided_change(ch, available_coins)
 
-
     def search_food_with_patch_size_by_intelligent_column(self, available_coins, patch_size, coins_to_save):
         rows = []
         for element in coins_to_save:

@@ -10,7 +10,7 @@ def generate_population(bee_type, num_of_bees):
 
 class BeeAlgorithm:
     def __init__(self, available_coins, coins_to_save, amount_of_bees, amount_of_best_bees, expected_quantity_of_coins,
-                 statistical_day, patch_size):
+                 statistical_day, patch_size, type_of_selecting_patch):
         self.available_coins = available_coins
         self.statistical_day = statistical_day
         self.coins_to_save = coins_to_save
@@ -22,27 +22,33 @@ class BeeAlgorithm:
         self.population = []
         self.list_of_best_cost_solutions = []
         self.best_bee = None
-
-        self.temp_solution=0
+        self.type_of_selecting_patch = type_of_selecting_patch
+        self.temp_solution = 0
 
     def generate_start_population(self):
         self.population = generate_population(BeeType.Scout, self.amount_of_bees);
         return
 
     def create_scout_bees(self, amount_of_scouts):
-        print('Population of created scouts: ' + str(self.amount_of_bees-self.amount_of_bees_searching_patch))
+        print('Population of created scouts: ' + str(self.amount_of_bees - self.amount_of_bees_searching_patch))
         return [Bee(BeeType.Scout) for _ in range(amount_of_scouts)]
 
     def calculate_change(self):
         for bee in self.population:
             if bee.bee_type == BeeType.Scout:
-                #print('hey')
+                # print('hey')
                 bee.calculate_change_randomly(self.statistical_day, self.available_coins);
             elif bee.bee_type == BeeType.Onlooker:
-                #bee.search_food_with_patch_size_by_intelligent_column(self.available_coins, self.patch_size, self.coins_to_save)
-                #bee.search_food_with_patch_size_by_random_column(self.available_coins, self.patch_size)
-                bee.search_food_with_patch_size_by_selecting_random_cells(self.available_coins, self.patch_size)
-
+                if self.type_of_selecting_patch == SelectPatch.RandomColumns:
+                    bee.search_food_with_patch_size_by_random_column(self.available_coins, self.patch_size)
+                elif self.type_of_selecting_patch == SelectPatch.IntelligentColumns:
+                    bee.search_food_with_patch_size_by_intelligent_column(self.available_coins, self.patch_size,
+                                                                          self.coins_to_save)
+                elif self.type_of_selecting_patch == SelectPatch.RandomCells:
+                    bee.search_food_with_patch_size_by_selecting_random_cells(self.available_coins, self.patch_size)
+                elif self.type_of_selecting_patch == SelectPatch.IntelligentCells:
+                    bee.search_food_with_patch_size_by_selecting_intelligent_cells(self.available_coins,
+                                                                                   self.patch_size, self.coins_to_save)
 
     def perform_next_iteration(self):
         self.calculate_change()
@@ -61,7 +67,7 @@ class BeeAlgorithm:
         free_bees = (self.amount_of_bees_searching_patch + self.amount_of_bees) - self.population.__len__()
 
         for bee in onlooker_bees:
-            bee.set_to_be_onlooker()        #could be optimized -> copy construtor without iterating
+            bee.set_to_be_onlooker()  # could be optimized -> copy construtor without iterating
 
         self.population = [bee for bee in self.population if bee.bee_type == BeeType.Scout]
         self.population += onlooker_bees;
@@ -95,7 +101,7 @@ class BeeAlgorithm:
         for column in range(encoders.cols_encoder.values().__len__()):
             for row in range(encoders.rows_encoder.__len__()):
                 if self.best_bee.solution_matrix[row, column] != 0:
-                   change += r[row] * self.best_bee.solution_matrix[row, column];
+                    change += r[row] * self.best_bee.solution_matrix[row, column];
         self.temp_solution = change
         return change
 
@@ -117,3 +123,10 @@ class BeeAlgorithm:
         r = list(encoders.rows_encoder.keys());
 
         print('solution: ' + str(self.calc_solution()))
+
+
+class SelectPatch():
+    RandomColumns = "Random column"
+    IntelligentColumns = "Intelligent column"
+    RandomCells = "Random cells"
+    IntelligentCells = "Intelligent cells"

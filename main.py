@@ -2,6 +2,7 @@ from BeeAlgorithm import BeeAlgorithm, BeeType
 import INI
 from matplotlib import pyplot as plt
 import time
+from BeeAlgorithm import SelectPatch
 import encoders
 
 available_coins = INI.available_coins
@@ -36,25 +37,35 @@ def validation_input_data():
 
 if __name__ == '__main__':
     if validation_input_data():
-        bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_scouts, amount_of_best_bees,
-                                     expected_quantity_of_coins, statistical_day, patch_size)
-        bee_algorithm.generate_start_population();
-        print(sum(bee_algorithm.statistical_day));
-        for i in range(max_iterations):
-            start = time.time()
-            bee_algorithm.perform_next_iteration()
-            if i == 0:
-                bee_algorithm.print_bees_solution()
-            end = time.time()
-            print('Time of performing iteration: ' + str(end - start) + '\n')
-
+        patch_type = SelectPatch()
+        y_lim = []
+        selecting_type_patch = [patch_type.RandomColumns, patch_type.RandomCells, patch_type.IntelligentColumns]
         plt.figure(figsize=(fig_width, fig_height))
-        plt.plot([_ for _ in range(max_iterations)], bee_algorithm.list_of_best_cost_solutions)
+        for select_patch in selecting_type_patch:
+            bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_scouts, amount_of_best_bees,
+                                         expected_quantity_of_coins, statistical_day, patch_size,
+                                         select_patch)
+            bee_algorithm.generate_start_population()
+            print(sum(bee_algorithm.statistical_day))
+            for i in range(max_iterations):
+                start = time.time()
+                bee_algorithm.perform_next_iteration()
+                if i == 0:
+                    bee_algorithm.print_bees_solution()
+                end = time.time()
+                print('Time of performing iteration: ' + str(end - start) + '\n')
+            plt.plot([_ for _ in range(max_iterations)], bee_algorithm.list_of_best_cost_solutions)
+            y_lim.append(bee_algorithm.list_of_best_cost_solutions[0])
+
+        plt.legend(selecting_type_patch)
         plt.title('Bees Algorithm (BA)')
         plt.xlabel('iteration')
         plt.ylabel('fitness value')
         bee_algorithm.print_bees_solution()
         axes = plt.gca()
         axes.set_xlim([1, max_iterations])
-        axes.set_ylim([0, bee_algorithm.list_of_best_cost_solutions[0]])
+        axes.set_ylim([0, max(y_lim) + 10])
         plt.show()
+
+
+
