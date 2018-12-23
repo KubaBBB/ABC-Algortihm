@@ -7,8 +7,8 @@ class Bee:
     def __init__(self, bee_type):
         self.number_of_ways_to_give_change = 22
         self.number_of_used_banknotes_and_coins = 8
-        self.solution_matrix = np.zeros((self.number_of_used_banknotes_and_coins, self.number_of_ways_to_give_change),
-                                        dtype=int)
+        self.solution_matrix = np.zeros((self.number_of_used_banknotes_and_coins, self.number_of_ways_to_give_change), dtype=int)
+        self.solution = np.sum(self.solution_matrix)
         self.cost = [10000]
         self.bee_type = bee_type;
 
@@ -40,12 +40,11 @@ class Bee:
                 temp = temp + generated_value
                 self.solution_matrix[rows_encoder[generated_value]][cols_encoder[value]] += 1
 
-    def search_food_with_patch_size(self, available_coins, patch_size):
+    def search_food_with_patch_size_by_random_column(self, available_coins, patch_size):
         keys = list(rows_encoder.keys())
         patch = sorted(sample(range(22), patch_size), key=int)
 
         for column in patch:
-            #max_money_to_change =
             change = 0
             for row in range(rows_encoder.__len__()):
                 if self.solution_matrix[row, column] != 0:
@@ -58,6 +57,56 @@ class Bee:
                 adjusted_change = break_the_rest_to_exchange(change)
                 for ch in adjusted_change:
                     self.calculate_for_every_divided_change(ch, available_coins)
+
+    def search_food_with_patch_size_by_selecting_random_cells(self, available_coins, patch_size):
+        keys = list(rows_encoder.keys())
+        columns = sorted(sample(range(22), patch_size), key=int)
+        rows = sorted(sample(range(8), patch_size), key=int)
+        change = 0
+        for index in range(patch_size):
+            change += keys[rows[index]] * self.solution_matrix[rows[index], columns[index]]
+            self.solution_matrix[rows[index], columns[index]] = 0
+
+        if change < 499:
+            self.calculate_for_every_divided_change(change, available_coins)
+        else:
+            adjusted_change = break_the_rest_to_exchange(change)
+            for ch in adjusted_change:
+                self.calculate_for_every_divided_change(ch, available_coins)
+
+
+    def search_food_with_patch_size_by_intelligent_column(self, available_coins, patch_size, coins_to_save):
+        rows = []
+        for element in coins_to_save:
+            rows.append(rows_encoder[element])
+        patch = []
+        coins_to_change_ranking = []
+
+        for col in range(np.shape(self.solution_matrix)[1]):
+            change = 0
+            iterator = 0
+            for row in rows:
+                change += coins_to_save[iterator] * self.solution_matrix[row, col]
+                iterator += 1
+            coins_to_change_ranking.append(change)
+        column_indexes_to_save = np.argsort(coins_to_change_ranking)[-patch_size:]
+
+        patch = sorted(column_indexes_to_save)
+
+        keys = list(rows_encoder.keys())
+        money_to_change = 0
+        for column in patch:
+            for row in range(rows_encoder.__len__()):
+                if self.solution_matrix[row, column] != 0:
+                    money_to_change = money_to_change + keys[row]*self.solution_matrix[row, column]
+                    self.solution_matrix[row, column] = 0
+        if money_to_change < 499:
+            self.calculate_for_every_divided_change(money_to_change, available_coins)
+        else:
+            adjusted_change = break_the_rest_to_exchange(money_to_change)
+            sum = np.sum(adjusted_change)
+            for ch in adjusted_change:
+                self.calculate_for_every_divided_change(ch, available_coins)
 
     def calculate_for_every_divided_change(self, change, available_coins):
         divided_change = [get_digit(change, 2) * 100,
@@ -73,6 +122,9 @@ class Bee:
 
     def reload_solution_matrix(self):
         self.solution_matrix.fill(0)
+
+    def calc_solution(self):
+        self.solution=np.sum(self.solution_matrix)
 
     def print_cost(self):
         print('Bee cost: ' + str(self.cost))

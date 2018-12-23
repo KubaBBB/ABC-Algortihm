@@ -23,6 +23,8 @@ class BeeAlgorithm:
         self.list_of_best_cost_solutions = []
         self.best_bee = None
 
+        self.temp_solution=0
+
     def generate_start_population(self):
         self.population = generate_population(BeeType.Scout, self.amount_of_bees);
         return
@@ -37,13 +39,18 @@ class BeeAlgorithm:
                 #print('hey')
                 bee.calculate_change_randomly(self.statistical_day, self.available_coins);
             elif bee.bee_type == BeeType.Onlooker:
-                bee.search_food_with_patch_size(self.available_coins, self.patch_size);
+                #bee.search_food_with_patch_size_by_intelligent_column(self.available_coins, self.patch_size, self.coins_to_save)
+                #bee.search_food_with_patch_size_by_random_column(self.available_coins, self.patch_size)
+                bee.search_food_with_patch_size_by_selecting_random_cells(self.available_coins, self.patch_size)
+
 
     def perform_next_iteration(self):
         self.calculate_change()
         self.calculate_fitness_cost()
         self.best_bee = self.choose_best_bee(self.best_bee)
+        self.calc_solution()
         self.print_best_bee()
+        self.print_bees_solution()
         self.reload_solution()
         self.update_population()
         self.print_amount_of_population()
@@ -53,11 +60,10 @@ class BeeAlgorithm:
         onlooker_bees = [deepcopy(self.best_bee) for _ in range(self.amount_of_bees_searching_patch)]
         free_bees = (self.amount_of_bees_searching_patch + self.amount_of_bees) - self.population.__len__()
 
-        if free_bees != 0:
-            for bee in onlooker_bees:
-                bee.set_to_be_onlooker()        #could be optimized -> copy construtor without iterating
-        else:
-            self.population = [bee for bee in self.population if bee.bee_type != BeeType.Onlooker]
+        for bee in onlooker_bees:
+            bee.set_to_be_onlooker()        #could be optimized -> copy construtor without iterating
+
+        self.population = [bee for bee in self.population if bee.bee_type == BeeType.Scout]
         self.population += onlooker_bees;
 
     def reload_solution(self):
@@ -83,6 +89,16 @@ class BeeAlgorithm:
             bee.calculate_change_randomly(self.statistical_day, self.available_coins)
         self.best_bee = self.choose_best_bee(self.best_bee)
 
+    def calc_solution(self):
+        change = 0
+        r = list(encoders.rows_encoder.keys());
+        for column in range(encoders.cols_encoder.values().__len__()):
+            for row in range(encoders.rows_encoder.__len__()):
+                if self.best_bee.solution_matrix[row, column] != 0:
+                   change += r[row] * self.best_bee.solution_matrix[row, column];
+        self.temp_solution = change
+        return change
+
     def print_best_bee(self):
         if self.best_bee is not None:
             print('Best bee and its cost: ')
@@ -99,8 +115,5 @@ class BeeAlgorithm:
         print('Scouts' + str(sum((i.bee_type == BeeType.Scout) for i in self.population)))
         change = 0
         r = list(encoders.rows_encoder.keys());
-        for column in range(encoders.cols_encoder.values().__len__()):
-            for row in range(encoders.rows_encoder.__len__()):
-                if self.best_bee.solution_matrix[row, column] != 0:
-                   change += r[row] * self.best_bee.solution_matrix[row, column];
-        print('solution: ' + str(change))
+
+        print('solution: ' + str(self.calc_solution()))

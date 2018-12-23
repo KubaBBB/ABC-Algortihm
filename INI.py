@@ -6,7 +6,7 @@ coins_to_save = [2, 5, 20, 100]
 
 max_iterations = 50
 expected_quantity_of_coins = [50, 25, 20, 10]
-amount_of_bees = 10
-amount_of_best_bees = 3
+amount_of_scouts = 10
+amount_of_best_bees = 5
 
 patch_size = 3;

@@ -11,7 +11,7 @@ coins_to_save = INI.coins_to_save
 max_iterations = INI.max_iterations
 required_cost = sum(statistical_day) / 1000
 expected_quantity_of_coins = INI.expected_quantity_of_coins
-amount_of_bees = INI.amount_of_bees
+amount_of_scouts = INI.amount_of_scouts
 amount_of_best_bees = INI.amount_of_best_bees
 patch_size = INI.patch_size
 
@@ -23,8 +23,7 @@ fig_height = 10
 
 
 def validation_input_data():
-    if (amount_of_best_bees >= amount_of_bees or
-            amount_of_bees < 0 or
+    if (amount_of_scouts < 0 or
             amount_of_best_bees < 0 or
             patch_size < 0 or
             len(sorted(coins for coins in coins_to_save if coins <= 0)) or
@@ -37,7 +36,7 @@ def validation_input_data():
 
 if __name__ == '__main__':
     if validation_input_data():
-        bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_bees, amount_of_best_bees,
+        bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_scouts, amount_of_best_bees,
                                      expected_quantity_of_coins, statistical_day, patch_size)
         bee_algorithm.generate_start_population();
         print(sum(bee_algorithm.statistical_day));
