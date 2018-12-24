@@ -115,6 +115,38 @@ class Bee:
             for ch in adjusted_change:
                 self.calculate_for_every_divided_change(ch, available_coins)
 
+    def search_food_with_patch_size_by_selecting_intelligent_cells(self, available_coins, patch_size, coins_to_save):
+        keys = list(rows_encoder.keys())
+        sum_rows = []
+        for i in range(len(coins_to_save)):
+            sum_rows.append(sum(self.solution_matrix[rows_encoder[coins_to_save[i]]])*coins_to_save[i])
+        best_rows = []
+        sorted_rows = sorted(sum_rows)
+        sorted_rows.reverse()
+        for i in range(patch_size):
+            if i <= patch_size:
+                best_rows.append(sum_rows[i])
+
+        rows = []
+        for i in range(patch_size):
+                max_val = max(sorted_rows)
+                index = sum_rows.index(max_val)
+                rows.append(index)
+                sorted_rows.remove(max_val)
+        cols = [np.random.randint(7) + 15 for i in range(patch_size)]
+
+        change = 0
+        for index in range(patch_size):
+            change += keys[rows[index]] * self.solution_matrix[rows[index], cols[index]]
+            self.solution_matrix[rows[index], cols[index]] = 0
+
+        if change < 499:
+            self.calculate_for_every_divided_change(change, available_coins)
+        else:
+            adjusted_change = break_the_rest_to_exchange(change)
+            for ch in adjusted_change:
+                self.calculate_for_every_divided_change(ch, available_coins)
+
     def calculate_for_every_divided_change(self, change, available_coins):
         divided_change = [get_digit(change, 2) * 100,
                           get_digit(change, 1) * 10,
@@ -124,7 +156,7 @@ class Bee:
             self.divide_value(value, adjusted_available_coins)
 
     def set_to_be_onlooker(self):
-        self.bee_type = BeeType.Onlooker;
+        self.bee_type = BeeType.Onlooker
         pass
 
     def reload_solution_matrix(self):
@@ -148,6 +180,7 @@ def break_the_rest_to_exchange(value):
         exchange_list.append(generated_value)
 
     return exchange_list
+
 
 def get_digit(number, n):
     return number // 10 ** n % 10

@@ -42,12 +42,14 @@ if __name__ == '__main__':
         y_lim = []
         fitness_types = [FitnessFunction.QuantityOfCoins, FitnessFunction.ValueOfCoins]
         for fitness in fitness_types:
-            selecting_type_patch = [patch_type.RandomColumns, patch_type.RandomCells, patch_type.IntelligentColumns]
+            #selecting_type_patch = [patch_type.RandomColumns, patch_type.RandomCells, patch_type.IntelligentColumns,
+             #                       patch_type.IntelligentCells]
+            selecting_type_patch = [patch_type.IntelligentCells]
             plt.figure(figsize=(fig_width, fig_height))
             for select_patch in selecting_type_patch:
                 bee_algorithm = BeeAlgorithm(available_coins, coins_to_save, amount_of_scouts, amount_of_best_bees,
                                              expected_quantity_of_coins, statistical_day, patch_size,
-                                             select_patch, fitness_types[1])
+                                             select_patch, fitness)
                 bee_algorithm.generate_start_population()
                 print(sum(bee_algorithm.statistical_day))
                 for i in range(max_iterations):
