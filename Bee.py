@@ -9,7 +9,7 @@ class Bee:
         self.number_of_used_banknotes_and_coins = 8
         self.solution_matrix = np.zeros((self.number_of_used_banknotes_and_coins, self.number_of_ways_to_give_change), dtype=int)
         self.solution = np.sum(self.solution_matrix)
-        self.cost = [10000]
+        self.cost = [20000]
         self.bee_type = bee_type;
 
     def calculate_bee_cost(self, coins_to_save, expected_quantity_of_coins):
@@ -17,7 +17,7 @@ class Bee:
         difference = np.zeros(len(coins_to_save))
         for i in range(len(coins_to_save)):
             value_of_rows[i] = sum(self.solution_matrix[rows_encoder[coins_to_save[i]]])
-            difference[i] = abs(value_of_rows[i] - expected_quantity_of_coins[i])
+            difference[i] = abs(value_of_rows[i])
         self.cost = sum(difference)
         return self.cost
 
