@@ -1,6 +1,5 @@
 from Bee import *
 from copy import deepcopy
-
 import encoders
 
 
@@ -11,7 +10,7 @@ def generate_population(bee_type, num_of_bees):
 
 class BeeAlgorithm:
     def __init__(self, available_coins, coins_to_save, amount_of_bees, amount_of_best_bees, expected_quantity_of_coins,
-                 statistical_day, patch_size, type_of_selecting_patch, type_of_fitness_function):
+                 statistical_day, patch_size, type_of_agorithm, type_of_selecting_patch, type_of_fitness_function):
         self.available_coins = available_coins
         self.statistical_day = statistical_day
         self.coins_to_save = coins_to_save
@@ -22,6 +21,8 @@ class BeeAlgorithm:
         self.patch_size = patch_size
         self.population = []
         self.list_of_best_cost_solutions = []
+        self.list_of_best_bees = []
+        self.type_of_algorithm = type_of_agorithm
         self.best_bee = None
         self.type_of_selecting_patch = type_of_selecting_patch
         self.type_of_fitness_function = type_of_fitness_function
@@ -38,7 +39,6 @@ class BeeAlgorithm:
     def calculate_change(self):
         for bee in self.population:
             if bee.bee_type == BeeType.Scout:
-                # print('hey')
                 bee.calculate_change_randomly(self.statistical_day, self.available_coins);
             elif bee.bee_type == BeeType.Onlooker:
                 if self.type_of_selecting_patch == SelectPatch.RandomColumns:
@@ -59,12 +59,33 @@ class BeeAlgorithm:
         self.calc_solution()
         self.print_best_bee()
         self.print_bees_solution()
-        self.reload_solution()
+        #if self.type_of_algorithm == AlgorithmType.BA:
+            #self.reload_solution()
         self.update_population()
         self.print_amount_of_population()
         return
 
     def update_population(self):
+        if self.type_of_algorithm == AlgorithmType.ABC:
+            self.update_population_ABC()
+        elif self.type_of_algorithm == AlgorithmType.BA:
+            self.update_population_BA()
+
+    def update_population_ABC(self):
+        list_of_best_bees = [deepcopy(self.population[i]) for i in range(5)]
+        # onlooker_bees = [deepcopy(self.best_bee) for _ in range(self.amount_of_bees_searching_patch)]
+        choices = np.random.choice(list_of_best_bees, self.amount_of_bees_searching_patch, p=[0.4, 0.3, 0.2, 0.1, 0])
+
+        onlooker_bees = [deepcopy(choices[i]) for i in range(self.amount_of_bees_searching_patch)]
+        # free_bees = (self.amount_of_bees_searching_patch + self.amount_of_bees) - self.population.__len__()
+
+        for bee in onlooker_bees:
+            bee.set_to_be_onlooker()  # could be optimized -> copy construtor without iterating
+
+        self.population = [bee for bee in self.population if bee.bee_type == BeeType.Scout]
+        self.population += onlooker_bees;
+
+    def update_population_BA(self):
         onlooker_bees = [deepcopy(self.best_bee) for _ in range(self.amount_of_bees_searching_patch)]
         free_bees = (self.amount_of_bees_searching_patch + self.amount_of_bees) - self.population.__len__()
 
@@ -129,12 +150,16 @@ class BeeAlgorithm:
 
 
 class SelectPatch():
-    RandomColumns = "Random column"
-    IntelligentColumns = "Intelligent column"
-    RandomCells = "Random cells"
-    IntelligentCells = "Intelligent cells"
+    RandomColumns = "Losowe kolumny"
+    IntelligentColumns = "Najlepsze kolumny"
+    RandomCells = "Losowe komórki"
+    IntelligentCells = "Najlepsze komórki"
 
 
 class FitnessFunction():
-    QuantityOfCoins = "Amount of quantity of coins"
-    ValueOfCoins = "Total value of coins to save"
+    QuantityOfCoins = "Ilość oszczędzanych nominałów"
+    ValueOfCoins = "Wartość oszczędzanych nominałów"
+
+class AlgorithmType():
+    ABC = "Artificial Bee Colony (ABC)"
+    BA = "Bees Algorithm (BA)"
