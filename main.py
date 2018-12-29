@@ -40,12 +40,18 @@ def validation_input_data():
 def plot_bar(time_of_performing_every_iter, select_type_patch):
     index = np.arange(len(select_type_patch))
     bar_width = 0.35
+    bars = []
     for i in range(len(select_type_patch)):
-        plt.bar(index[i]+bar_width, time_of_performing_every_iter[i], width=bar_width)
+        bar = plt.bar(index[i]+bar_width, time_of_performing_every_iter[i], width=bar_width)
+        bars += bar;
     plt.xticks(index+bar_width, select_type_patch)
+    for rect in bars:
+        height = rect.get_height()
+        plt.text(rect.get_x() + rect.get_width() / 2.0, height, '%.2f' % height, ha='center', va='bottom')
     plt.title("Wpływ metody presuzkiwania otoczenia na czas obliczeń")
-    plt.ylabel("Czas wykonywania się iteracji[t]")
+    plt.ylabel("Czas wykonywania się iteracji [s]")
     plt.xlabel("Metoda przeszukiwania otoczenia")
+    plt.tight_layout()
     plt.show()
 
 if __name__ == '__main__':
@@ -83,8 +89,8 @@ if __name__ == '__main__':
             print(f'Method of fitness function: {fitness}')
             plt.legend(selecting_type_patch)
             plt.title('Bees Algorithm (BA)')
-            plt.xlabel('iteration')
-            plt.ylabel('fitness value')
+            plt.xlabel('Iteracje')
+            plt.ylabel('Wartość funkcji celu')
             bee_algorithm.print_bees_solution()
             axes = plt.gca()
             axes.set_xlim([1, max_iterations])

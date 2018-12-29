@@ -1,7 +1,7 @@
 import numpy as np
 from encoders import *
 from random import sample
-
+from numba import jit
 
 class Bee:
     def __init__(self, bee_type):
@@ -82,6 +82,7 @@ class Bee:
             for ch in adjusted_change:
                 self.calculate_for_every_divided_change(ch, available_coins)
 
+    #@jit()
     def search_food_with_patch_size_by_intelligent_column(self, available_coins, patch_size, coins_to_save):
         rows = []
         for element in coins_to_save:
