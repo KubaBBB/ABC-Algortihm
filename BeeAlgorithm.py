@@ -57,12 +57,13 @@ class BeeAlgorithm:
         self.calculate_fitness_cost()
         self.best_bee = self.choose_best_bee(self.best_bee)
         self.calc_solution()
-        self.print_best_bee()
-        self.print_bees_solution()
+        #self.print_best_bee()
+        #self.print_bees_solution()
         #if self.type_of_algorithm == AlgorithmType.BA:
             #self.reload_solution()
         self.update_population()
-        self.print_amount_of_population()
+        #self.print_amount_of_population()
+        self.print_calc_info()
         return
 
     def update_population(self):
@@ -145,9 +146,12 @@ class BeeAlgorithm:
     def print_bees_solution(self):
         print('onlookers' + str(sum((i.bee_type == BeeType.Onlooker) for i in self.population)))
         print('Scouts' + str(sum((i.bee_type == BeeType.Scout) for i in self.population)))
-
         print('solution: ' + str(self.calc_solution()))
 
+    def print_calc_info(self):
+        print(f'Alg: {self.type_of_algorithm}, fitness: {self.type_of_fitness_function}')
+        best_cost = self.best_bee.cost
+        print(f'Patch: {self.type_of_selecting_patch} bee_cost: {best_cost}')
 
 class SelectPatch():
     RandomColumns = "Losowe kolumny"
